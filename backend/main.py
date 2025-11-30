@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from contextlib import asynccontextmanager
 from sqlalchemy.orm import Session
+from pydantic import EmailStr
 import sys
 from pathlib import Path
 from time import time
@@ -217,7 +218,6 @@ async def resend_verification_endpoint(
     db: Session = Depends(get_db)
 ):
     from email_verification import resend_verification_email
-    from pydantic import EmailStr
     success = resend_verification_email(email, db)
     if not success:
         raise HTTPException(
