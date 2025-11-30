@@ -15,9 +15,6 @@ RATE_LIMITS = {
 def get_rate_limit(endpoint: str) -> str:
     return RATE_LIMITS.get(endpoint, RATE_LIMITS["api_general"])
 def setup_rate_limiting(app):
-    """
-    Configura rate limiting en la aplicación FastAPI
-    """
     app.state.limiter = limiter
     app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
     return limiter

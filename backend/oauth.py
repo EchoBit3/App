@@ -31,9 +31,6 @@ else:
         "en variables de entorno para habilitar login con Google."
     )
 async def google_login(request: Request):
-    """
-    Inicia el flujo de autenticación con Google
-    """
     if not OAUTH_ENABLED:
         raise HTTPException(
             status_code=501,
@@ -42,10 +39,6 @@ async def google_login(request: Request):
     redirect_uri = request.url_for('google_callback')
     return await oauth.google.authorize_redirect(request, redirect_uri)
 async def google_callback(request: Request, db: Session):
-    """
-    Callback de Google OAuth
-    Crea o actualiza usuario basado en información de Google
-    """
     if not OAUTH_ENABLED:
         raise HTTPException(
             status_code=501,

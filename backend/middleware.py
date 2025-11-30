@@ -94,7 +94,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
             return forwarded.split(",")[0].strip()
         return request.client.host if request.client else "unknown"
     def _clean_old_requests(self, ip: str):
-        """Limpia requests antiguos fuera de la ventana"""
         with self.lock:
             cutoff_time = datetime.now() - timedelta(seconds=self.window_seconds)
             self.requests[ip] = [

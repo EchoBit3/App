@@ -76,7 +76,6 @@ class RequestLogger:
         )
     def log_response(self, method: str, path: str, status_code: int,
                      response_time_ms: float, **kwargs):
-        """Log de response"""
         level = "info" if status_code < 400 else "warning"
         log_func = getattr(self.logger, level)
         log_func(
