@@ -11,7 +11,7 @@ Una aplicación web diseñada para ayudar a personas neurodivergentes (autismo, 
 
 ---
 
-## 🎯 ¿Para qué sirve?
+##  ¿Para qué sirve?
 
 Imagina que te dicen: *"Haz un backup de tu computadora"*
 
@@ -35,22 +35,22 @@ Para muchas personas, esta instrucción es **confusa y abrumadora**:
 
 ---
 
-## 🌟 Características Principales
+##  Características Principales
 
-### 🧠 Diseñado para Neurodivergencia
+###  Diseñado para Neurodivergencia
 - **Lenguaje claro y directo** (sin metáforas ni ambigüedades)
 - **Pasos numerados** fáciles de seguir
 - **Interfaz predecible** (botones siempre en el mismo lugar)
 - **Sin animaciones distractoras** (modo reducido opcional)
 - **Alto contraste** para mejor legibilidad
 
-### 🔒 Seguridad y Privacidad
+###  Seguridad y Privacidad
 - **Autenticación segura**: Login con usuario/contraseña o Google
 - **Encriptación**: Tus datos están protegidos
 - **Rate limiting**: Protección contra ataques
 - **Verificación de email**: Opcional pero recomendado
 
-### 📊 Funcionalidades
+###  Funcionalidades
 - **Historial**: Guarda tus análisis anteriores
 - **Dashboard**: Estadísticas de uso
 - **Exportar**: Descarga resultados en JSON/TXT
@@ -58,7 +58,7 @@ Para muchas personas, esta instrucción es **confusa y abrumadora**:
 
 ---
 
-## 🚀 Instalación Rápida
+##  Instalación Rápida
 
 ### Requisitos Previos
 - **Python 3.9 o superior** → [Descargar aquí](https://www.python.org/downloads/)
@@ -150,7 +150,7 @@ Aplicación corriendo en: http://localhost:3000
 
 ---
 
-## 🗂️ Estructura del Proyecto
+##  Estructura del Proyecto
 
 ```
 demystify/
@@ -222,7 +222,7 @@ python encryption.py generate-key
 
 ---
 
-## 🛠️ Tecnologías Usadas
+## Tecnologías Usadas
 
 ### Backend
 - **FastAPI** - Framework web moderno para Python
@@ -322,7 +322,7 @@ Abre un [Issue](https://github.com/tu-usuario/demystify/issues) describiendo:
 
 ---
 
-## 💡 Casos de Uso
+##  Casos de Uso
 
 ### Para Personas Autistas
 - Entender instrucciones vagas del trabajo/escuela
@@ -347,17 +347,16 @@ Abre un [Issue](https://github.com/tu-usuario/demystify/issues) describiendo:
 Este proyecto es software libre bajo la licencia **MIT**.
 
 Puedes:
-- ✅ Usar comercialmente
 - ✅ Modificar
-- ✅ Distribuir
-- ✅ Uso privado
+- ✅ Compartir (Sin fines de lucro)
+
 
 Ver archivo [LICENSE](LICENSE) para más detalles.
 
 ---
 
 ##  Autor
-
+EchoBit3
 Creado con ❤️ para hacer la vida más fácil.
 
 **Misión:** Ayudar a personas neurodivergentes a entender mejor las instrucciones del día a día.
@@ -366,6 +365,8 @@ Creado con ❤️ para hacer la vida más fácil.
 
 ## 🙏 Agradecimientos
 
+- A mis docentes por siempre exigirnos dar lo mejor.
+- A mis compañeros de segundo año por motivarme y compartir sus conocimientos.
 - [FastAPI](https://fastapi.tiangolo.com/) - Framework increíble
 - [React](https://react.dev/) - Librería poderosa
 - [Google AI](https://ai.google.dev/) - API gratuita de Gemini
@@ -378,9 +379,9 @@ Creado con ❤️ para hacer la vida más fácil.
 
 ¿Necesitas ayuda?
 
-- 📖 Lee la documentación completa: http://localhost:8001/docs
-- 🐛 Reporta bugs: [Issues](https://github.com/tu-usuario/demystify/issues)
-- 💬 Preguntas: [Discussions](https://github.com/tu-usuario/demystify/discussions)
+- Lee la documentación completa: http://localhost:8001/docs
+- Reporta bugs: [Issues](https://github.com/tu-usuario/demystify/issues)
+- Preguntas: [Discussions](https://github.com/tu-usuario/demystify/discussions)
 
 ---
 
