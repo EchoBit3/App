@@ -27,11 +27,9 @@ Para muchas personas, esta instrucción es **confusa y abrumadora**:
 1. Conecta un disco duro externo
 2. Abre la configuración de Windows
 3. Busca "Backup"
-4. ...
-
- **Información que falta:** "No especificaste qué archivos respaldar"
-
- **Preguntas para aclarar:** "¿Quieres respaldar solo documentos o todo el sistema?"
+4. Selecciona "Copia de seguridad"
+5. Elige los archivos que deseas respaldar
+6. Inicia el proceso de backup
 
 ---
 
