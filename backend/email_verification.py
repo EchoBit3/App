@@ -22,25 +22,10 @@ FRONTEND_URL = os.getenv("FRONTEND_URL", "http://localhost:3000")
 EMAIL_VERIFICATION_REQUIRED = os.getenv("EMAIL_VERIFICATION_REQUIRED", "false").lower() == "true"
 EMAIL_VERIFICATION_ENABLED = bool(SMTP_USERNAME and SMTP_PASSWORD)
 def generate_verification_token() -> str:
-    """
-    Genera un token de verificación seguro
-    """
     return secrets.token_urlsafe(32)
 def is_email_verification_enabled() -> bool:
-    """
-    Verifica si el sistema de email está configurado
-    """
     return EMAIL_VERIFICATION_ENABLED
 def send_verification_email(email: str, token: str, username: str) -> bool:
-    """
-    Envía email de verificación al usuario
-    Args:
-        email: Email del usuario
-        token: Token de verificación
-        username: Nombre de usuario
-    Returns:
-        bool: True si se envió correctamente
-    """
     if not EMAIL_VERIFICATION_ENABLED:
         print("ADVERTENCIA: Email verification no configurado (SMTP credentials faltantes)")
         return False
@@ -156,14 +141,6 @@ def send_verification_email(email: str, token: str, username: str) -> bool:
         print(f"Error enviando email: {str(e)}")
         return False
 def verify_email_token(token: str, db: Session) -> Optional[Usuario]:
-    """
-    Verifica un token de email y marca la cuenta como verificada
-    Args:
-        token: Token de verificación
-        db: Sesión de base de datos
-    Returns:
-        Usuario si el token es válido, None si no
-    """
     try:
         # Buscar usuario con este token
         usuario = db.query(Usuario).filter(
@@ -193,14 +170,6 @@ def verify_email_token(token: str, db: Session) -> Optional[Usuario]:
         db.rollback()
         return None
 def resend_verification_email(email: str, db: Session) -> bool:
-    """
-    Reenvía email de verificación
-    Args:
-        email: Email del usuario
-        db: Sesión de base de datos
-    Returns:
-        bool: True si se envió correctamente
-    """
     try:
         # Buscar usuario
         usuario = db.query(Usuario).filter(Usuario.email == email).first()
@@ -221,7 +190,4 @@ def resend_verification_email(email: str, db: Session) -> bool:
         db.rollback()
         return False
 def should_verify_email() -> bool:
-    """
-    Determina si se debe requerir verificación de email
-    """
     return EMAIL_VERIFICATION_REQUIRED and EMAIL_VERIFICATION_ENABLED

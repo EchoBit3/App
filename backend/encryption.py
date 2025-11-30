@@ -29,13 +29,6 @@ if not ENCRYPTION_KEY:
 # Inicializar cipher
 cipher_suite = Fernet(ENCRYPTION_KEY.encode())
 def encrypt_data(plaintext: Optional[str]) -> Optional[str]:
-    """
-    Encripta un string.
-    Args:
-        plaintext: Texto a encriptar
-    Returns:
-        String encriptado en base64, o None si el input es None
-    """
     if plaintext is None or plaintext == "":
         return None
     try:
@@ -45,13 +38,6 @@ def encrypt_data(plaintext: Optional[str]) -> Optional[str]:
         warnings.warn(f"Error al encriptar datos: {str(e)}")
         return plaintext  # Fallback: devolver sin encriptar
 def decrypt_data(ciphertext: Optional[str]) -> Optional[str]:
-    """
-    Desencripta un string.
-    Args:
-        ciphertext: String encriptado
-    Returns:
-        Texto desencriptado, o None si el input es None
-    """
     if ciphertext is None or ciphertext == "":
         return None
     try:
@@ -63,33 +49,19 @@ def decrypt_data(ciphertext: Optional[str]) -> Optional[str]:
         warnings.warn(f"Error al desencriptar datos: {str(e)}")
         return ciphertext  # Fallback: devolver tal cual
 def encrypt_email(email: str) -> str:
-    """
-    Encripta un email para almacenamiento seguro.
-    Mantiene formato para búsquedas (hash + encrypted).
-    """
     if not email:
         return ""
     # Encriptar el email completo
     encrypted = encrypt_data(email)
     return encrypted if encrypted else email
 def decrypt_email(encrypted_email: str) -> str:
-    """
-    Desencripta un email.
-    """
     if not encrypted_email:
         return ""
     return decrypt_data(encrypted_email) or encrypted_email
 def generate_encryption_key() -> str:
-    """
-    Genera una nueva encryption key segura.
-    Usar este comando para generar ENCRYPTION_KEY en producción.
-    """
     key = Fernet.generate_key()
     return key.decode()
 def is_encryption_configured() -> bool:
-    """
-    Verifica si la encriptación está configurada correctamente.
-    """
     return bool(os.getenv("ENCRYPTION_KEY"))
 # Utilidad para CLI
 if __name__ == "__main__":

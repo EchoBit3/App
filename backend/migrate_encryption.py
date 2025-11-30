@@ -7,17 +7,11 @@ from encryption import encrypt_email, encrypt_data, is_encryption_configured
 from sqlalchemy import inspect
 import warnings
 def check_if_migration_needed():
-    """
-    Verifica si la migración ya se realizó
-    """
     inspector = inspect(engine)
     columns = [col['name'] for col in inspector.get_columns('usuarios')]
     # Si ya tiene las columnas con _ es que ya migró el schema
     return '_email' not in columns
 def migrate_existing_data():
-    """
-    Encripta datos de usuarios y consultas existentes
-    """
     if not is_encryption_configured():
         print("ADVERTENCIA: ENCRYPTION_KEY no configurada.")
         print("   Los datos se encriptarán con key temporal.")
@@ -85,9 +79,6 @@ def migrate_existing_data():
     finally:
         db.close()
 def verify_encryption():
-    """
-    Verifica que los datos estén correctamente encriptados
-    """
     print("\nVerificando encriptación...")
     print("=" * 50)
     db = SessionLocal()

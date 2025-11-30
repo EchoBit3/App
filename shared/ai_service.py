@@ -40,11 +40,6 @@ Analiza la siguiente tarea y proporciona tu respuesta en formato JSON válido co
 Responde ÚNICAMENTE con el JSON, sin texto adicional antes o después."""
 class AIService:
     def __init__(self):
-        """
-        Inicializa el servicio de IA con Google Gemini.
-        Raises:
-            ValueError: Si GEMINI_API_KEY no está configurada
-        """
         api_key = os.getenv("GEMINI_API_KEY")
         if not api_key:
             raise ValueError("GEMINI_API_KEY no configurada en .env")
