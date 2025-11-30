@@ -6,7 +6,6 @@ from pathlib import Path
 from typing import Any, Dict, Optional
 import traceback
 class StructuredLogger:
-    """Logger con formato estructurado (JSON) para producción"""
     def __init__(self, name: str, log_file: Optional[str] = "api.log", level=logging.INFO):
         self.logger = logging.getLogger(name)
         self.logger.setLevel(level)
@@ -34,7 +33,6 @@ class StructuredLogger:
         message: str,
         extra: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
-        """Construye contexto estructurado para el log"""
         context = {
             "timestamp": datetime.utcnow().isoformat(),
             "message": message,
@@ -43,15 +41,12 @@ class StructuredLogger:
             context.update(extra)
         return context
     def info(self, message: str, **kwargs):
-        """Log info con contexto"""
         context = self._build_context(message, kwargs)
         self.logger.info(json.dumps(context) if kwargs else message)
     def warning(self, message: str, **kwargs):
-        """Log warning con contexto"""
         context = self._build_context(message, kwargs)
         self.logger.warning(json.dumps(context) if kwargs else message)
     def error(self, message: str, error: Optional[Exception] = None, **kwargs):
-        """Log error con contexto y stack trace"""
         context = self._build_context(message, kwargs)
         if error:
             context["error_type"] = type(error).__name__
@@ -59,7 +54,6 @@ class StructuredLogger:
             context["stack_trace"] = traceback.format_exc()
         self.logger.error(json.dumps(context) if (kwargs or error) else message)
     def critical(self, message: str, error: Optional[Exception] = None, **kwargs):
-        """Log critical con contexto completo"""
         context = self._build_context(message, kwargs)
         if error:
             context["error_type"] = type(error).__name__
@@ -67,15 +61,12 @@ class StructuredLogger:
             context["stack_trace"] = traceback.format_exc()
         self.logger.critical(json.dumps(context) if (kwargs or error) else message)
     def debug(self, message: str, **kwargs):
-        """Log debug con contexto"""
         context = self._build_context(message, kwargs)
         self.logger.debug(json.dumps(context) if kwargs else message)
 class RequestLogger:
-    """Logger especializado para requests HTTP"""
     def __init__(self, logger: StructuredLogger):
         self.logger = logger
     def log_request(self, method: str, path: str, user_id: Optional[int] = None, **kwargs):
-        """Log de request entrante"""
         self.logger.info(
             f"{method} {path}",
             method=method,
@@ -97,7 +88,6 @@ class RequestLogger:
             **kwargs
         )
     def log_error(self, method: str, path: str, error: Exception, **kwargs):
-        """Log de error en request"""
         self.logger.error(
             f"Error en {method} {path}",
             error=error,
@@ -106,11 +96,9 @@ class RequestLogger:
             **kwargs
         )
 class BusinessLogger:
-    """Logger especializado para lógica de negocio"""
     def __init__(self, logger: StructuredLogger):
         self.logger = logger
     def log_user_action(self, action: str, user_id: int, **kwargs):
-        """Log de acción de usuario"""
         self.logger.info(
             f"User action: {action}",
             action=action,
@@ -119,7 +107,6 @@ class BusinessLogger:
         )
     def log_ai_call(self, input_length: int, response_time_ms: float,
                     success: bool, **kwargs):
-        """Log de llamada a AI"""
         self.logger.info(
             (
                 f"AI call - Input: {input_length} chars, "
@@ -131,14 +118,12 @@ class BusinessLogger:
             **kwargs
         )
     def log_cache_hit(self, cache_key: str):
-        """Log de cache hit"""
         self.logger.debug(
             f"Cache HIT: {cache_key[:50]}...",
             cache_key=cache_key,
             cache_hit=True
         )
     def log_cache_miss(self, cache_key: str):
-        """Log de cache miss"""
         self.logger.debug(
             f"Cache MISS: {cache_key[:50]}...",
             cache_key=cache_key,
@@ -149,26 +134,22 @@ _main_logger: Optional[StructuredLogger] = None
 _request_logger: Optional[RequestLogger] = None
 _business_logger: Optional[BusinessLogger] = None
 def get_logger() -> StructuredLogger:
-    """Obtiene el logger principal"""
     global _main_logger
     if _main_logger is None:
         _main_logger = StructuredLogger("demystify", log_file="logs/api.log")
     return _main_logger
 def get_request_logger() -> RequestLogger:
-    """Obtiene el logger de requests"""
     global _request_logger
     if _request_logger is None:
         _request_logger = RequestLogger(get_logger())
     return _request_logger
 def get_business_logger() -> BusinessLogger:
-    """Obtiene el logger de negocio"""
     global _business_logger
     if _business_logger is None:
         _business_logger = BusinessLogger(get_logger())
     return _business_logger
 # Para compatibilidad con código existente
 def setup_logging(level=logging.INFO):
-    """Setup del sistema de logging"""
     global _main_logger
     _main_logger = StructuredLogger("demystify", log_file="logs/api.log", level=level)
     return _main_logger

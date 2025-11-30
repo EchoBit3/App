@@ -67,7 +67,6 @@ Responde en formato JSON como se indicó."""
                 "preguntas_sugeridas": []
             }
     def _procesar_con_gemini(self, prompt_usuario: str) -> Dict[str, Any]:
-        """Procesa con Google Gemini"""
         prompt_completo = f"{SYSTEM_PROMPT}\n\nTarea a analizar:\n{prompt_usuario}"
         # Configuración de generación
         generation_config = {
@@ -145,7 +144,6 @@ Formato de respuesta (JSON):
             raise Exception(f"JSON incompleto o mal formado. Por favor, intenta de nuevo.")
 # Función auxiliar para testing rápido
 def test_ai_service():
-    """Función de prueba"""
     servicio = AIService()
     texto_prueba = "Hacer un ensayo sobre la Segunda Guerra Mundial para el viernes"
     print("Probando De-Mystify...")

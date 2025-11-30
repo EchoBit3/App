@@ -8,7 +8,6 @@ from threading import Lock
 import logging
 logger = logging.getLogger(__name__)
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
-    """Middleware para logging de requests"""
     async def dispatch(self, request: Request, call_next):
         # Log request
         start_time = time()
@@ -26,7 +25,6 @@ class RequestLoggingMiddleware(BaseHTTPMiddleware):
         response.headers["X-Process-Time"] = str(process_time)
         return response
 class RequestStatsMiddleware(BaseHTTPMiddleware):
-    """Middleware para estadísticas de requests"""
     def __init__(self, app, stats_tracker):
         super().__init__(app)
         self.stats = stats_tracker
@@ -47,7 +45,6 @@ class RequestStatsMiddleware(BaseHTTPMiddleware):
             self.stats.record_error()
             raise
 class StatsTracker:
-    """Rastreador de estadísticas de la API"""
     def __init__(self):
         self.total_requests = 0
         self.successful_requests = 0
@@ -55,7 +52,6 @@ class StatsTracker:
         self.response_times = []
         self.start_time = time()
     def record_request(self, path: str, method: str, status_code: int, response_time: float):
-        """Registra un request"""
         self.total_requests += 1
         if 200 <= status_code < 400:
             self.successful_requests += 1
@@ -66,11 +62,9 @@ class StatsTracker:
         if len(self.response_times) > 1000:
             self.response_times = self.response_times[-1000:]
     def record_error(self):
-        """Registra un error"""
         self.total_requests += 1
         self.failed_requests += 1
     def get_stats(self) -> dict:
-        """Obtiene las estadísticas actuales"""
         avg_time = sum(self.response_times) / len(self.response_times) if self.response_times else 0
         uptime = time() - self.start_time
         return {
@@ -81,14 +75,12 @@ class StatsTracker:
             "uptime": round(uptime, 2)
         }
     def reset(self):
-        """Resetea las estadísticas"""
         self.total_requests = 0
         self.successful_requests = 0
         self.failed_requests = 0
         self.response_times = []
         self.start_time = time()
 class RateLimitMiddleware(BaseHTTPMiddleware):
-    """Middleware para rate limiting por IP"""
     def __init__(self, app, requests_per_window: int = 60, window_seconds: int = 60):
         super().__init__(app)
         self.requests_per_window = requests_per_window
@@ -97,7 +89,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.lock = Lock()  # Thread safety para acceso concurrente
         self.max_ips_tracked = 10000  # Prevenir memory leak
     def _get_client_ip(self, request: Request) -> str:
-        """Obtiene la IP del cliente considerando proxies"""
         forwarded = request.headers.get("X-Forwarded-For")
         if forwarded:
             return forwarded.split(",")[0].strip()
@@ -162,7 +153,6 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         response.headers["X-RateLimit-Window"] = str(self.window_seconds)
         return response
 class APIKeyMiddleware(BaseHTTPMiddleware):
-    """Middleware para autenticación con API Key"""
     def __init__(self, app, api_keys: list, enabled: bool = True):
         super().__init__(app)
         self.api_keys = set(api_keys)  # Set para búsqueda O(1)
@@ -204,7 +194,6 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
         logger.info(f"Valid API key for {request.url.path}")
         return await call_next(request)
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
-    """Middleware para agregar headers de seguridad"""
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
         # Headers de seguridad estándar
