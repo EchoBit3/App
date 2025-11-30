@@ -8,7 +8,6 @@ from encryption import encrypt_data, decrypt_data, encrypt_email, decrypt_email
 # Base para modelos
 Base = declarative_base()
 class Usuario(Base):
-    """Modelo de usuario con encriptación de datos sensibles"""
     __tablename__ = "usuarios"
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String(50), unique=True, nullable=False, index=True)
@@ -31,24 +30,19 @@ class Usuario(Base):
     # Propiedades híbridas para encriptación automática
     @hybrid_property
     def email(self):
-        """Desencripta email al leer"""
         return decrypt_email(self._email) if self._email else None
     @email.setter
     def email(self, value):
-        """Encripta email al guardar"""
         self._email = encrypt_email(value) if value else None
     @hybrid_property
     def nombre_completo(self):
-        """Desencripta nombre al leer"""
         return decrypt_data(self._nombre_completo) if self._nombre_completo else None
     @nombre_completo.setter
     def nombre_completo(self, value):
-        """Encripta nombre al guardar"""
         self._nombre_completo = encrypt_data(value) if value else None
     def __repr__(self):
         return f"<Usuario {self.username}>"
 class Consulta(Base):
-    """Modelo de consulta/análisis con encriptación de texto sensible"""
     __tablename__ = "consultas"
     id = Column(Integer, primary_key=True, index=True)
     usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
@@ -64,11 +58,9 @@ class Consulta(Base):
     # Propiedad híbrida para texto_original
     @hybrid_property
     def texto_original(self):
-        """Desencripta texto al leer"""
         return decrypt_data(self._texto_original) if self._texto_original else None
     @texto_original.setter
     def texto_original(self, value):
-        """Encripta texto al guardar"""
         self._texto_original = encrypt_data(value) if value else None
     def __repr__(self):
         return f"<Consulta {self.id} - Usuario {self.usuario_id}>"
@@ -83,24 +75,15 @@ engine = create_engine(
 # Session factory
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 def init_db():
-    """Inicializa la base de datos creando todas las tablas"""
     Base.metadata.create_all(bind=engine)
     print("Base de datos inicializada")
 def get_db():
-    """
-    Dependency para obtener sesión de BD
-    Usar con FastAPI Depends
-    """
     db = SessionLocal()
     try:
         yield db
     finally:
         db.close()
 def reset_db():
-    """
-    CUIDADO: Elimina y recrea todas las tablas
-    Solo usar en desarrollo
-    """
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
     print("Base de datos reseteada")

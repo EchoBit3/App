@@ -22,22 +22,18 @@ pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 security = HTTPBearer()
 # ==================== SCHEMAS ====================
 class UserCreate(BaseModel):
-    """Schema para registro de usuario"""
     username: str = Field(..., min_length=3, max_length=50)
     email: EmailStr
     password: str = Field(..., min_length=6, max_length=100)
     nombre_completo: Optional[str] = Field(None, max_length=100)
 class UserLogin(BaseModel):
-    """Schema para login"""
     username: str
     password: str
 class Token(BaseModel):
-    """Schema para respuesta de token"""
     access_token: str
     token_type: str = "bearer"
     user: dict
 class UserResponse(BaseModel):
-    """Schema para respuesta de usuario"""
     id: int
     username: str
     email: str
@@ -49,14 +45,11 @@ class UserResponse(BaseModel):
         from_attributes = True
 # ==================== FUNCIONES DE HASHING ====================
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifica que la contraseña coincida con el hash"""
     return pwd_context.verify(plain_password, hashed_password)
 def get_password_hash(password: str) -> str:
-    """Genera hash de contraseña"""
     return pwd_context.hash(password)
 # ==================== JWT ====================
 def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -> str:
-    """Crea un token JWT"""
     from datetime import timezone
     to_encode = data.copy()
     if expires_delta:
@@ -67,7 +60,6 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None) -
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 def decode_access_token(token: str) -> dict:
-    """Decodifica y valida un token JWT"""
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         return payload
@@ -79,7 +71,6 @@ def decode_access_token(token: str) -> dict:
         )
 # ==================== AUTENTICACIÓN ====================
 def authenticate_user(db: Session, username: str, password: str) -> Optional[Usuario]:
-    """Autentica un usuario verificando username y password"""
     user = db.query(Usuario).filter(Usuario.username == username).first()
     if not user:
         return None
@@ -90,10 +81,6 @@ def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ) -> Usuario:
-    """
-    Dependency para obtener el usuario actual desde el token JWT
-    Usar en rutas protegidas: current_user: Usuario = Depends(get_current_user)
-    """
     token = credentials.credentials
     try:
         payload = decode_access_token(token)
@@ -123,10 +110,6 @@ def get_current_user(
         )
     return user
 def get_current_admin(current_user: Usuario = Depends(get_current_user)) -> Usuario:
-    """
-    Dependency para rutas que requieren admin
-    Usar: current_user: Usuario = Depends(get_current_admin)
-    """
     if not current_user.is_admin:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
@@ -139,7 +122,6 @@ def create_user(
     user_data: UserCreate,
     skip_email_verification: bool = False
 ) -> Usuario:
-    """Crea un nuevo usuario en la base de datos"""
     from email_verification import (
         generate_verification_token,
         send_verification_email,
@@ -187,7 +169,6 @@ def create_user(
         send_verification_email(db_user.email, verification_token, db_user.username)
     return db_user
 def login_user(db: Session, login_data: UserLogin) -> Token:
-    """Login de usuario, retorna token JWT"""
     user = authenticate_user(db, login_data.username, login_data.password)
     if not user:
         raise HTTPException(

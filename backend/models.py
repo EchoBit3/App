@@ -4,7 +4,6 @@ from datetime import datetime
 import re
 import html
 class TareaRequest(BaseModel):
-    """Modelo para el request de análisis de tarea"""
     texto: str = Field(
         ...,
         min_length=10,
@@ -14,7 +13,6 @@ class TareaRequest(BaseModel):
     @field_validator('texto')
     @classmethod
     def validar_texto(cls, v: str) -> str:
-        """Valida y sanitiza el texto contra inyecciones"""
         if not v or not v.strip():
             raise ValueError('El texto no puede estar vacío')
         # Sanitizar: eliminar caracteres de control
@@ -35,7 +33,6 @@ class TareaRequest(BaseModel):
             }
         }
 class TareaResponse(BaseModel):
-    """Modelo para la respuesta del análisis"""
     pasos: List[str] = Field(..., description="Lista de pasos concretos y accionables")
     ambiguedades: List[str] = Field(..., description="Información faltante o poco clara")
     preguntas_sugeridas: List[str] = Field(..., description="Preguntas para clarificar")
@@ -70,7 +67,6 @@ class TareaResponse(BaseModel):
             }
         }
 class ErrorResponse(BaseModel):
-    """Modelo para respuestas de error"""
     error: str = Field(..., description="Mensaje de error")
     detail: Optional[str] = Field(None, description="Detalles adicionales del error")
     timestamp: str = Field(default_factory=lambda: datetime.now().isoformat())
@@ -83,7 +79,6 @@ class ErrorResponse(BaseModel):
             }
         }
 class HealthResponse(BaseModel):
-    """Modelo para respuesta de health check"""
     status: str = Field(..., description="Estado del servicio")
     ai_service: str = Field(..., description="Estado del servicio de IA")
     version: str = Field(..., description="Versión de la API")
@@ -98,15 +93,12 @@ class HealthResponse(BaseModel):
             }
         }
 class EjemploItem(BaseModel):
-    """Modelo para un ejemplo individual"""
     categoria: str = Field(..., description="Categoría del ejemplo")
     texto: str = Field(..., description="Texto del ejemplo")
 class EjemplosResponse(BaseModel):
-    """Modelo para respuesta de ejemplos"""
     ejemplos: List[EjemploItem] = Field(..., description="Lista de ejemplos")
     total: int = Field(..., description="Total de ejemplos disponibles")
 class StatsResponse(BaseModel):
-    """Modelo para estadísticas de la API"""
     total_requests: int = Field(..., description="Total de requests procesados")
     successful_requests: int = Field(..., description="Requests exitosos")
     failed_requests: int = Field(..., description="Requests fallidos")
