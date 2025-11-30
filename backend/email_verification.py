@@ -8,6 +8,8 @@ import secrets
 from sqlalchemy.orm import Session
 from database import Usuario
 from config import Settings
+from logger import get_logger
+logger = get_logger()
 settings = Settings()
 # Configuración de SMTP
 SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
@@ -27,10 +29,9 @@ def is_email_verification_enabled() -> bool:
     return EMAIL_VERIFICATION_ENABLED
 def send_verification_email(email: str, token: str, username: str) -> bool:
     if not EMAIL_VERIFICATION_ENABLED:
-        print("ADVERTENCIA: Email verification no configurado (SMTP credentials faltantes)")
+        logger.warning("Email verification no configurado (SMTP credentials faltantes)")
         return False
     try:
-        # Crear mensaje
         msg = MIMEMultipart('alternative')
         msg['Subject'] = "Verifica tu cuenta - Demystify"
         msg['From'] = f"{SMTP_FROM_NAME} <{SMTP_FROM_EMAIL}>"
@@ -156,17 +157,17 @@ def verify_email_token(token: str, db: Session) -> Optional[Usuario]:
         # Verificar expiración (24 horas)
         if usuario.verification_token_expires:
             if datetime.utcnow() > usuario.verification_token_expires:
-                print("Token expirado")
+                logger.warning("Token expirado")
                 return None
         # Marcar como verificado
         usuario.email_verified = True
         usuario.verification_token = None
         usuario.verification_token_expires = None
         db.commit()
-        print(f"Email verificado para usuario {usuario.username}")
+        logger.info(f"Email verificado para usuario {usuario.username}")
         return usuario
     except Exception as e:
-        print(f"Error verificando token: {str(e)}")
+        logger.error(f"Error verificando token: {str(e)}")
         db.rollback()
         return None
 def resend_verification_email(email: str, db: Session) -> bool:
@@ -176,7 +177,7 @@ def resend_verification_email(email: str, db: Session) -> bool:
         if not usuario:
             return False
         if usuario.email_verified:
-            print("Email ya está verificado")
+            logger.info("Email ya está verificado")
             return False
         # Generar nuevo token
         token = generate_verification_token()
@@ -186,7 +187,7 @@ def resend_verification_email(email: str, db: Session) -> bool:
         # Enviar email
         return send_verification_email(usuario.email, token, usuario.username)
     except Exception as e:
-        print(f"Error reenviando email: {str(e)}")
+        logger.error(f"Error reenviando email: {str(e)}")
         db.rollback()
         return False
 def should_verify_email() -> bool:

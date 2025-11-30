@@ -142,7 +142,6 @@ def create_user(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="El email ya está registrado"
         )
-    # Generar token de verificación si es necesario
     verification_token = None
     verification_expires = None
     if should_verify_email() and not skip_email_verification:

@@ -52,10 +52,8 @@ class Consulta(Base):
     preguntas = Column(Text)  # JSON string
     tiempo_respuesta_ms = Column(Integer)  # Tiempo de procesamiento
     cached = Column(Boolean, default=False)
-    created_at = Column(DateTime, default=datetime.now, index=True)
-    # Relación con usuario
+    created_at = Column(DateTime, default=datetime.utcnow)
     usuario = relationship("Usuario", back_populates="consultas")
-    # Propiedad híbrida para texto_original
     @hybrid_property
     def texto_original(self):
         return decrypt_data(self._texto_original) if self._texto_original else None
@@ -76,7 +74,8 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 def init_db():
     Base.metadata.create_all(bind=engine)
-    print("Base de datos inicializada")
+    import logging
+    logging.info("Base de datos inicializada")
 def get_db():
     db = SessionLocal()
     try:
@@ -86,7 +85,8 @@ def get_db():
 def reset_db():
     Base.metadata.drop_all(bind=engine)
     Base.metadata.create_all(bind=engine)
-    print("Base de datos reseteada")
+    import logging
+    logging.info("Base de datos reseteada")
 if __name__ == "__main__":
     # Test: crear tablas
     init_db()

@@ -9,9 +9,7 @@ from pathlib import Path
 from time import time
 import logging
 import json
-# Sistema de logging centralizado
 from logger import get_logger, get_request_logger, get_business_logger
-# Imports locales
 from models import (
     TareaRequest, TareaResponse, ErrorResponse,
     HealthResponse, EjemplosResponse, EjemploItem, StatsResponse
@@ -22,49 +20,39 @@ from middleware import (
 )
 from config import get_settings
 from utils import SimpleCache, generate_cache_key, measure_time
-# Database y Auth
 from database import get_db, init_db, Usuario, Consulta
 from auth import (
     get_current_user, get_current_admin,
     UserCreate, UserLogin, UserResponse, Token,
     create_user, login_user
 )
-# OAuth y Rate Limiting
 from oauth import google_login, google_callback, is_oauth_enabled, OAUTH_ENABLED
 from rate_limiter import setup_rate_limiting, limiter, RATE_LIMITS
 # Agregar el directorio raíz al path para importar shared
 sys.path.append(str(Path(__file__).parent.parent))
 from shared.ai_service import AIService
-# Configurar logging estructurado
 logger = get_logger()
 request_logger = get_request_logger()
 business_logger = get_business_logger()
-# Obtener configuración
 settings = get_settings()
-# Inicializar trackers y cache
 stats_tracker = StatsTracker()
 cache = SimpleCache(ttl=settings.cache_ttl)
 start_time = time()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Startup
     logger.info(
         "Iniciando De-Mystify API",
         version=settings.app_version,
         host=settings.host,
         port=settings.port
     )
-    # Inicializar base de datos
     init_db()
     logger.info("Base de datos inicializada")
-    # Configurar rate limiting
     setup_rate_limiting(app)
     logger.info("Rate limiting configurado")
     yield
-    # Shutdown
     logger.info("Cerrando De-Mystify API")
     logger.info(f"Stats finales: {stats_tracker.get_stats()}")
-# Crear app FastAPI
 app = FastAPI(
     title=settings.app_name,
     description=settings.app_description,
@@ -73,7 +61,6 @@ app = FastAPI(
     redoc_url="/redoc",
     lifespan=lifespan
 )
-# Configurar CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins,
@@ -101,10 +88,8 @@ if settings.require_api_key:
         logger.info(f"API Key authentication enabled ({len(api_keys)} keys)")
     else:
         logger.warning("ADVERTENCIA: require_api_key=True but no API keys configured")
-# Agregar middlewares personalizados
 app.add_middleware(RequestLoggingMiddleware)
 app.add_middleware(RequestStatsMiddleware, stats_tracker=stats_tracker)
-# Inicializar servicio de IA (singleton)
 ai_service = None
 try:
     ai_service = AIService()
@@ -140,9 +125,7 @@ async def health_check():
 @limiter.limit(RATE_LIMITS["auth_register"])
 async def register(request: Request, user_data: UserCreate, db: Session = Depends(get_db)):
     try:
-        # Crear usuario
         user = create_user(db, user_data)
-        # Login automático
         login_data = UserLogin(username=user.username, password=user_data.password)
         token = login_user(db, login_data)
         business_logger.log_user_action(
@@ -272,10 +255,8 @@ async def desambiguar_tarea(
             business_logger.log_cache_miss(cache_key)
     try:
         logger.info(f"Procesando tarea de {len(request.texto)} caracteres", user_id=current_user.id)
-        # Procesar con el servicio de IA con timeout
         import asyncio
         try:
-            # Ejecutar con timeout configurado
             resultado = await asyncio.wait_for(
                 asyncio.to_thread(ai_service.desambiguar_tarea, request.texto),
                 timeout=settings.gemini_timeout
@@ -289,7 +270,6 @@ async def desambiguar_tarea(
                     "Intenta con un texto más corto."
                 )
             )
-        # Verificar si hubo error
         if "error" in resultado:
             logger.error(
                 "Error en procesamiento IA",
