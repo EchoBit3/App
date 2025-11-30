@@ -39,7 +39,6 @@ Analiza la siguiente tarea y proporciona tu respuesta en formato JSON válido co
 }
 Responde ÚNICAMENTE con el JSON, sin texto adicional antes o después."""
 class AIService:
-    """Servicio para interactuar con Google Gemini"""
     def __init__(self):
         """
         Inicializa el servicio de IA con Google Gemini.
@@ -53,13 +52,6 @@ class AIService:
         self.model = genai.GenerativeModel(GEMINI_MODEL)
         logger.info(f"Gemini inicializado con modelo: {GEMINI_MODEL}")
     def desambiguar_tarea(self, texto_tarea: str) -> Dict[str, Any]:
-        """
-        Procesa una tarea ambigua y la convierte en pasos concretos usando Gemini.
-        Args:
-            texto_tarea: El texto de la tarea a analizar
-        Returns:
-            Dict[str, Any]: Diccionario con 'pasos', 'ambiguedades' y 'preguntas_sugeridas'
-        """
         prompt_usuario = f"""Analiza la siguiente tarea o instrucción:
 "{texto_tarea}"
 Desglósala en pasos concretos e identifica qué información falta o es ambigua.

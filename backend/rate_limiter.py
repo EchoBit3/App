@@ -13,7 +13,6 @@ RATE_LIMITS = {
     "api_analizar": "10/minute",  # 10 análisis por minuto
 }
 def get_rate_limit(endpoint: str) -> str:
-    """Obtiene el límite para un endpoint específico"""
     return RATE_LIMITS.get(endpoint, RATE_LIMITS["api_general"])
 def setup_rate_limiting(app):
     """

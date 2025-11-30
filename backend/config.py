@@ -2,7 +2,6 @@ import os
 from functools import lru_cache
 from pydantic_settings import BaseSettings
 class Settings(BaseSettings):
-    """Configuración de la aplicación"""
     # API Info
     app_name: str = "De-Mystify API"
     app_version: str = "2.0.0"
@@ -41,7 +40,6 @@ class Settings(BaseSettings):
     # Security Headers
     enable_security_headers: bool = True
     def get_api_keys_list(self) -> list:
-        """Retorna lista de API keys válidas"""
         if not self.api_keys:
             return []
         return [key.strip() for key in self.api_keys.split(",") if key.strip()]
@@ -49,6 +47,6 @@ class Settings(BaseSettings):
         env_file = ".env"
         case_sensitive = False
 @lru_cache()
+@lru_cache()
 def get_settings() -> Settings:
-    """Obtiene la configuración (singleton con cache)"""
     return Settings()
