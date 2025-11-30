@@ -19,7 +19,6 @@ alembic==1.13.3          # Migrations (opcional)
 # Authentication
 python-jose[cryptography]==3.3.0  # JWT tokens
 passlib[bcrypt]==1.7.4   # Password hashing
-python-multipart==0.0.20 # Form data
 
 # Testing y desarrollo
 colorama==0.4.6          # Colores en terminal para test_security.py
