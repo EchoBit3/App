@@ -40,16 +40,3 @@ def measure_time(func):
         logger.info(f"{func.__name__} took {elapsed:.2f}ms")
         return result
     return wrapper
-def format_response(data: dict, success: bool = True) -> dict:
-    return {
-        "success": success,
-        "data": data,
-        "timestamp": time()
-    }
-def sanitize_text(text: str, max_length: int = 2000) -> str:
-    # Remover espacios extras
-    text = " ".join(text.split())
-    # Truncar si es muy largo
-    if len(text) > max_length:
-        text = text[:max_length]
-    return text.strip()

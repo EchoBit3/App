@@ -107,5 +107,3 @@ async def google_callback(request: Request, db: Session):
             status_code=400,
             detail=f"Error en autenticación con Google: {str(e)}"
         )
-def is_oauth_enabled() -> bool:
-    return OAUTH_ENABLED

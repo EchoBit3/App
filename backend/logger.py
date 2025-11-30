@@ -63,37 +63,6 @@ class StructuredLogger:
     def debug(self, message: str, **kwargs):
         context = self._build_context(message, kwargs)
         self.logger.debug(json.dumps(context) if kwargs else message)
-class RequestLogger:
-    def __init__(self, logger: StructuredLogger):
-        self.logger = logger
-    def log_request(self, method: str, path: str, user_id: Optional[int] = None, **kwargs):
-        self.logger.info(
-            f"{method} {path}",
-            method=method,
-            path=path,
-            user_id=user_id,
-            **kwargs
-        )
-    def log_response(self, method: str, path: str, status_code: int,
-                     response_time_ms: float, **kwargs):
-        level = "info" if status_code < 400 else "warning"
-        log_func = getattr(self.logger, level)
-        log_func(
-            f"{method} {path} - {status_code} ({response_time_ms:.2f}ms)",
-            method=method,
-            path=path,
-            status_code=status_code,
-            response_time_ms=response_time_ms,
-            **kwargs
-        )
-    def log_error(self, method: str, path: str, error: Exception, **kwargs):
-        self.logger.error(
-            f"Error en {method} {path}",
-            error=error,
-            method=method,
-            path=path,
-            **kwargs
-        )
 class BusinessLogger:
     def __init__(self, logger: StructuredLogger):
         self.logger = logger
@@ -130,18 +99,12 @@ class BusinessLogger:
         )
 # Singleton loggers
 _main_logger: Optional[StructuredLogger] = None
-_request_logger: Optional[RequestLogger] = None
 _business_logger: Optional[BusinessLogger] = None
 def get_logger() -> StructuredLogger:
     global _main_logger
     if _main_logger is None:
         _main_logger = StructuredLogger("demystify", log_file="logs/api.log")
     return _main_logger
-def get_request_logger() -> RequestLogger:
-    global _request_logger
-    if _request_logger is None:
-        _request_logger = RequestLogger(get_logger())
-    return _request_logger
 def get_business_logger() -> BusinessLogger:
     global _business_logger
     if _business_logger is None:

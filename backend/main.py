@@ -9,7 +9,7 @@ from pathlib import Path
 from time import time
 import logging
 import json
-from logger import get_logger, get_request_logger, get_business_logger
+from logger import get_logger, get_business_logger
 from models import (
     TareaRequest, TareaResponse, ErrorResponse,
     HealthResponse, EjemplosResponse, EjemploItem, StatsResponse
@@ -26,13 +26,12 @@ from auth import (
     UserCreate, UserLogin, UserResponse, Token,
     create_user, login_user
 )
-from oauth import google_login, google_callback, is_oauth_enabled, OAUTH_ENABLED
+from oauth import google_login, google_callback, OAUTH_ENABLED
 from rate_limiter import setup_rate_limiting, limiter, RATE_LIMITS
 # Agregar el directorio raíz al path para importar shared
 sys.path.append(str(Path(__file__).parent.parent))
 from shared.ai_service import AIService
 logger = get_logger()
-request_logger = get_request_logger()
 business_logger = get_business_logger()
 settings = get_settings()
 stats_tracker = StatsTracker()
