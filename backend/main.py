@@ -9,6 +9,9 @@ from pathlib import Path
 from time import time
 import logging
 import json
+import signal
+import asyncio
+from datetime import datetime
 from logger import get_logger, get_business_logger
 from models import (
     TareaRequest, TareaResponse, ErrorResponse,
@@ -254,7 +257,6 @@ async def desambiguar_tarea(
             business_logger.log_cache_miss(cache_key)
     try:
         logger.info(f"Procesando tarea de {len(request.texto)} caracteres", user_id=current_user.id)
-        import asyncio
         try:
             resultado = await asyncio.wait_for(
                 asyncio.to_thread(ai_service.desambiguar_tarea, request.texto),
@@ -279,10 +281,7 @@ async def desambiguar_tarea(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=resultado["error"]
             )
-        # Agregar metadata
-        from datetime import datetime
-        tiempo_proceso = (time() - start_process_time) * 1000  # En ms
-        # Log de llamada exitosa
+        tiempo_proceso = (time() - start_process_time) * 1000
         business_logger.log_ai_call(
             input_length=len(request.texto),
             response_time_ms=tiempo_proceso,
@@ -303,7 +302,6 @@ async def desambiguar_tarea(
                 "cached": False
             }
         }
-        # Guardar en base de datos
         try:
             consulta = Consulta(
                 usuario_id=current_user.id,
@@ -315,8 +313,6 @@ async def desambiguar_tarea(
                 cached=False
             )
             db.add(consulta)
-            # Timeout en commit para evitar bloqueos
-            import signal
             def timeout_handler(signum, frame):
                 raise TimeoutError("Database commit timeout")
             old_handler = signal.signal(signal.SIGALRM, timeout_handler)

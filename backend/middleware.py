@@ -9,19 +9,15 @@ import logging
 logger = logging.getLogger(__name__)
 class RequestLoggingMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
-        # Log request
         start_time = time()
         logger.info(f"{request.method} {request.url.path}")
-        # Process request
         response = await call_next(request)
-        # Log response
         process_time = (time() - start_time) * 1000
         logger.info(
             f"{request.method} {request.url.path} "
             f"- Status: {response.status_code} "
             f"- Time: {process_time:.2f}ms"
         )
-        # Add custom headers
         response.headers["X-Process-Time"] = str(process_time)
         return response
 class RequestStatsMiddleware(BaseHTTPMiddleware):
@@ -32,7 +28,6 @@ class RequestStatsMiddleware(BaseHTTPMiddleware):
         start_time = time()
         try:
             response = await call_next(request)
-            # Track stats
             process_time = (time() - start_time) * 1000
             self.stats.record_request(
                 path=request.url.path,
@@ -111,9 +106,7 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         if request.url.path in ["/health", "/docs", "/redoc", "/openapi.json"]:
             return await call_next(request)
         client_ip = self._get_client_ip(request)
-        # Limpiar requests antiguos
         self._clean_old_requests(client_ip)
-        # Verificar límite (con lock)
         with self.lock:
             current_requests = len(self.requests[client_ip])
         if current_requests >= self.requests_per_window:
@@ -139,12 +132,9 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
                     "Retry-After": str(max(retry_after, 1))
                 }
             )
-        # Registrar request (con lock)
         with self.lock:
             self.requests[client_ip].append(datetime.now())
-        # Procesar request
         response = await call_next(request)
-        # Agregar headers informativos
         with self.lock:
             remaining = self.requests_per_window - len(self.requests[client_ip])
         response.headers["X-RateLimit-Limit"] = str(self.requests_per_window)
@@ -162,7 +152,6 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
         # Excluir health check y docs de autenticación
         if request.url.path in ["/", "/health", "/docs", "/redoc", "/openapi.json"]:
             return await call_next(request)
-        # Verificar API key en header
         api_key = (
             request.headers.get("X-API-Key") or
             request.headers.get("Authorization", "").replace("Bearer ", "")
@@ -189,13 +178,11 @@ class APIKeyMiddleware(BaseHTTPMiddleware):
                     "detail": "La API key proporcionada no es válida"
                 }
             )
-        # API key válida
         logger.info(f"Valid API key for {request.url.path}")
         return await call_next(request)
 class SecurityHeadersMiddleware(BaseHTTPMiddleware):
     async def dispatch(self, request: Request, call_next):
         response = await call_next(request)
-        # Headers de seguridad estándar
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["X-XSS-Protection"] = "1; mode=block"
