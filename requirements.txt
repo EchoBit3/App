@@ -1,0 +1,77 @@
+# ============================================
+# DEMYSTIFY - DEPENDENCIAS DEL PROYECTO
+# ============================================
+# Este archivo es una REFERENCIA de todas las dependencias.
+# NO instalar desde aquí, usar los comandos de abajo.
+
+
+# ============================================
+# INSTALACIÓN
+# ============================================
+
+# 1. Backend (Python):
+#    cd backend
+#    pip install -r requirements.txt
+
+# 2. Frontend (Node.js):
+#    cd frontend
+#    npm install
+
+
+# ============================================
+# BACKEND - Python/FastAPI
+# ============================================
+
+fastapi==0.115.5                      # Framework web
+uvicorn==0.32.1                       # Servidor ASGI
+pydantic==2.10.3                      # Validación de datos
+sqlalchemy==2.0.36                    # Base de datos ORM
+python-dotenv==1.2.1                  # Variables de entorno
+google-generativeai==0.8.5            # IA de Google Gemini
+
+# Seguridad
+python-jose[cryptography]==3.3.0      # JWT tokens
+passlib[bcrypt]==1.7.4                # Hashing de contraseñas
+authlib==1.6.5                        # OAuth 2.0 (Google login)
+cryptography==46.0.3                  # Encriptación de datos
+slowapi                               # Rate limiting (anti fuerza bruta)
+python-multipart==0.0.20              # Formularios y archivos
+
+# Testing
+pytest==8.3.4                         # Framework de tests
+requests==2.32.3                      # Cliente HTTP
+
+
+# ============================================
+# FRONTEND - Node.js/React
+# ============================================
+
+# Core
+react@18.3.1                          # Librería UI
+react-dom@18.3.1                      # React para navegadores
+react-router-dom@7.9.6                # Navegación entre páginas
+axios@1.13.2                          # Cliente HTTP
+
+# UI y Animaciones
+tailwindcss@3.4.17                    # Estilos CSS modernos
+framer-motion@11.11.17                # Animaciones fluidas
+react-hot-toast@2.6.0                 # Notificaciones elegantes
+lucide-react@0.460.0                  # Iconos modernos
+@heroicons/react@2.2.0                # Iconos de Tailwind
+
+# Herramientas de Desarrollo
+vite@6.0.3                            # Build tool rápido
+@vitejs/plugin-react@4.3.4            # Plugin de React
+eslint@8.57.1                         # Detectar errores de código
+prettier@3.7.2                        # Formatear código bonito
+typescript@5.9.3                      # Type checking
+husky@9.1.7                           # Hooks de Git
+lint-staged@15.5.2                    # Lint antes de commit
+
+
+# ============================================
+# DOCUMENTACIÓN DETALLADA
+# ============================================
+# Backend:  Ver backend/requirements.txt
+# Frontend: Ver frontend/package.json
+

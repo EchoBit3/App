@@ -1,0 +1,58 @@
+# Frontend - De-Mystify
+# Node.js dependencies for React application
+
+# INSTALACIÓN
+# ============
+# npm install
+# o
+# yarn install
+
+# DEPENDENCIAS PRINCIPALES
+# =========================
+
+# Core React
+react@18.3.1
+react-dom@18.3.1
+react-router-dom@7.9.6
+
+# HTTP Client
+axios@1.13.2
+
+# UI/UX Libraries
+framer-motion@11.11.17          # Animaciones fluidas
+react-hot-toast@2.6.0           # Notificaciones toast
+tailwindcss@3.4.17              # Utility-first CSS
+lucide-react@0.460.0            # Iconos modernos
+@heroicons/react@2.2.0          # Iconos de Tailwind
+
+# Build Tools
+vite@6.0.3                      # Build tool ultra-rápido
+@vitejs/plugin-react@4.3.4      # Plugin de React para Vite
+
+# PostCSS
+postcss@8.4.49
+autoprefixer@10.4.20
+
+# Dev Tools
+eslint@8.57.1                   # Linter
+eslint-plugin-react@7.37.5
+eslint-plugin-react-hooks@4.6.2
+eslint-plugin-react-refresh@0.4.24
+prettier@3.7.2                  # Code formatter
+typescript@5.9.3                # Type checking
+husky@9.1.7                     # Git hooks
+lint-staged@15.5.2              # Pre-commit linting
+
+# SCRIPTS DISPONIBLES
+# ===================
+# npm run dev          - Servidor de desarrollo (localhost:3000)
+# npm run build        - Build para producción
+# npm run preview      - Preview del build
+# npm run lint         - Ejecutar ESLint
+# npm run lint:fix     - Auto-fix con ESLint
+# npm run format       - Formatear código con Prettier
+# npm run format:check - Verificar formato sin modificar
+
+# NOTA: Este archivo es informativo.
+# Las dependencias reales se gestionan en package.json
+# Para instalar: npm install

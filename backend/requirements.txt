@@ -1,0 +1,33 @@
+# Backend API REST - De-Mystify v2.0
+# Dependencias FastAPI mejoradas
+
+# Core FastAPI
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+pydantic==2.10.3
+pydantic-settings==2.7.0
+python-multipart==0.0.20
+
+# AI Service
+google-generativeai==0.8.5
+python-dotenv==1.2.1
+
+# Database
+sqlalchemy==2.0.36       # ORM
+alembic==1.13.3          # Migrations (opcional)
+
+# Authentication
+python-jose[cryptography]==3.3.0  # JWT tokens
+passlib[bcrypt]==1.7.4   # Password hashing
+python-multipart==0.0.20 # Form data
+
+# Testing y desarrollo
+colorama==0.4.6          # Colores en terminal para test_security.py
+requests==2.32.3         # Cliente HTTP para tests
+pytest==8.3.4            # Testing framework
+pytest-asyncio==0.24.0   # Async tests
+
+# Opcional: Production servers
+# gunicorn==21.2.0  # Para producción con múltiples workers
+# httptools==0.6.1  # Performance boost para uvicorn
+# uvloop==0.19.0    # Event loop más rápido (solo Linux/macOS)
