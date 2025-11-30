@@ -175,7 +175,7 @@ demystify/
 
 ---
 
-## ⚙️ Configuración Avanzada
+##  Configuración Avanzada
 
 ### Variables de Entorno (`.env`)
 
@@ -369,7 +369,7 @@ Creado con ❤️ para hacer la vida más fácil.
 - [React](https://react.dev/) - Librería poderosa
 - [Google AI](https://ai.google.dev/) - API gratuita de Gemini
 - [Tailwind CSS](https://tailwindcss.com/) - Estilos modernos
-- Comunidad open source 💙
+
 
 ---
 
