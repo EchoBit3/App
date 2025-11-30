@@ -46,7 +46,6 @@ cache = SimpleCache(ttl=settings.cache_ttl)
 start_time = time()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Manejo del ciclo de vida de la aplicación"""
     # Startup
     logger.info(
         "Iniciando De-Mystify API",
@@ -114,7 +113,6 @@ except Exception as e:
 # ==================== ENDPOINTS ====================
 @app.get("/", tags=["Health"])
 async def root():
-    """Endpoint raíz para verificar que la API está funcionando"""
     return {
         "message": "De-Mystify API está funcionando",
         "version": settings.app_version,
@@ -129,7 +127,6 @@ async def root():
     }
 @app.get("/health", response_model=HealthResponse, tags=["Health"])
 async def health_check():
-    """Endpoint de health check con información detallada"""
     uptime = time() - start_time
     return HealthResponse(
         status="healthy" if ai_service else "degraded",
@@ -141,15 +138,6 @@ async def health_check():
 @app.post("/api/auth/register", response_model=Token, tags=["Autenticación"])
 @limiter.limit(RATE_LIMITS["auth_register"])
 async def register(request: Request, user_data: UserCreate, db: Session = Depends(get_db)):
-    """
-    Registra un nuevo usuario.
-    - **username**: Nombre de usuario único (3-50 caracteres)
-    - **email**: Email único
-    - **password**: Contraseña (mínimo 6 caracteres)
-    - **nombre_completo**: Nombre completo (opcional)
-    **Rate Limit**: 3 registros por hora por IP
-    Retorna token JWT para autenticación automática.
-    """
     try:
         # Crear usuario
         user = create_user(db, user_data)
@@ -174,13 +162,6 @@ async def register(request: Request, user_data: UserCreate, db: Session = Depend
 @app.post("/api/auth/login", response_model=Token, tags=["Autenticación"])
 @limiter.limit(RATE_LIMITS["auth_login"])
 async def login(request: Request, login_data: UserLogin, db: Session = Depends(get_db)):
-    """
-    Inicia sesión con username y contraseña.
-    - **username**: Nombre de usuario
-    - **password**: Contraseña
-    **Rate Limit**: 5 intentos por minuto por IP (protección contra fuerza bruta)
-    Retorna token JWT válido por 7 días.
-    """
     try:
         token = login_user(db, login_data)
         business_logger.log_user_action(
@@ -199,42 +180,23 @@ async def login(request: Request, login_data: UserLogin, db: Session = Depends(g
         )
 @app.get("/api/auth/me", response_model=UserResponse, tags=["Autenticación"])
 async def get_me(current_user: Usuario = Depends(get_current_user)):
-    """
-    Obtiene información del usuario autenticado.
-    Requiere token JWT en header Authorization: Bearer <token>
-    """
     return current_user
 # ==================== OAUTH (GOOGLE) ====================
 @app.get("/api/auth/oauth/status", tags=["OAuth"])
 async def oauth_status():
-    """
-    Verifica si OAuth está habilitado
-    """
     return {
         "oauth_enabled": OAUTH_ENABLED,
         "providers": ["google"] if OAUTH_ENABLED else []
     }
 @app.get("/api/auth/google/login", tags=["OAuth"])
 async def auth_google_login(request: Request):
-    """
-    Inicia el flujo de autenticación con Google
-    Redirige al usuario a Google para autenticarse
-    """
     return await google_login(request)
 @app.get("/api/auth/google/callback", response_model=Token, tags=["OAuth"])
 async def auth_google_callback(request: Request, db: Session = Depends(get_db)):
-    """
-    Callback de Google OAuth
-    Procesa la respuesta de Google y crea/actualiza usuario
-    """
     return await google_callback(request, db)
 # ==================== VERIFICACIÓN DE EMAIL ====================
 @app.get("/api/auth/verify-email", tags=["Autenticación"])
 async def verify_email_endpoint(token: str, db: Session = Depends(get_db)):
-    """
-    Verifica el email de un usuario mediante token
-    - **token**: Token de verificación enviado por email
-    """
     from email_verification import verify_email_token
     usuario = verify_email_token(token, db)
     if not usuario:
@@ -254,11 +216,6 @@ async def resend_verification_endpoint(
     email: EmailStr,
     db: Session = Depends(get_db)
 ):
-    """
-    Reenvía email de verificación
-    - **email**: Email del usuario
-    **Rate Limit**: 3 por hora
-    """
     from email_verification import resend_verification_email
     from pydantic import EmailStr
     success = resend_verification_email(email, db)
@@ -293,18 +250,6 @@ async def desambiguar_tarea(
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(get_current_user)
 ) -> TareaResponse:
-    """
-    Analiza una tarea o instrucción ambigua y la convierte en pasos concretos.
-    **REQUIERE AUTENTICACIÓN** - Token JWT en header Authorization
-    - **texto**: Instrucción o tarea a analizar (10-2000 caracteres)
-    Retorna:
-    - **pasos**: Lista de pasos concretos y accionables
-    - **ambiguedades**: Información faltante o poco clara
-    - **preguntas_sugeridas**: Preguntas para clarificar las ambigüedades
-    - **metadata**: Información adicional sobre el análisis
-    **Nota**: Las respuestas son cacheadas por 5 minutos para mejorar performance.
-    Los análisis se guardan en el historial del usuario.
-    """
     start_process_time = time()
     # Verificar que el servicio de IA esté disponible
     if not ai_service:
@@ -442,13 +387,6 @@ async def obtener_historial(
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """
-    Obtiene el historial de consultas del usuario autenticado.
-    **REQUIERE AUTENTICACIÓN**
-    - **limit**: Cantidad máxima de resultados (default: 10)
-    - **offset**: Cantidad de resultados a saltar (para paginación)
-    Retorna lista de consultas ordenadas por fecha (más recientes primero).
-    """
     try:
         # Consultar historial del usuario
         consultas = db.query(Consulta)\
@@ -490,10 +428,6 @@ async def obtener_consulta(
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """
-    Obtiene una consulta específica por ID.
-    **REQUIERE AUTENTICACIÓN** - Solo puedes ver tus propias consultas.
-    """
     consulta = db.query(Consulta).filter(Consulta.id == consulta_id).first()
     if not consulta:
         raise HTTPException(
@@ -522,10 +456,6 @@ async def eliminar_consulta(
     current_user: Usuario = Depends(get_current_user),
     db: Session = Depends(get_db)
 ):
-    """
-    Elimina una consulta del historial.
-    **REQUIERE AUTENTICACIÓN** - Solo puedes eliminar tus propias consultas.
-    """
     consulta = db.query(Consulta).filter(Consulta.id == consulta_id).first()
     if not consulta:
         raise HTTPException(
@@ -549,10 +479,6 @@ async def eliminar_consulta(
 # ==================== UTILIDADES ====================
 @app.get("/api/ejemplos", response_model=EjemplosResponse, tags=["Utilidades"])
 async def obtener_ejemplos():
-    """
-    Retorna ejemplos de tareas para probar la API.
-    Útil para testing y demostración de funcionalidades.
-    """
     from shared.config import EJEMPLOS
     ejemplos = [
         EjemploItem(categoria=key, texto=value)
@@ -564,19 +490,10 @@ async def obtener_ejemplos():
     )
 @app.get("/api/stats", response_model=StatsResponse, tags=["Monitoreo"])
 async def obtener_estadisticas():
-    """
-    Retorna estadísticas de uso de la API.
-    Incluye:
-    - Total de requests procesados
-    - Requests exitosos y fallidos
-    - Tiempo promedio de respuesta
-    - Uptime del servidor
-    """
     stats = stats_tracker.get_stats()
     return StatsResponse(**stats)
 @app.get("/api/cache/stats", tags=["Monitoreo"])
 async def cache_stats():
-    """Retorna estadísticas del cache"""
     return {
         "cache_enabled": settings.enable_cache,
         "cache_size": cache.size(),
@@ -584,14 +501,12 @@ async def cache_stats():
     }
 @app.post("/api/cache/clear", tags=["Monitoreo"])
 async def clear_cache():
-    """Limpia el cache de respuestas"""
     cache.clear()
     logger.info("Cache limpiado manualmente")
     return {"message": "Cache limpiado correctamente"}
 # ==================== EXCEPTION HANDLERS ====================
 @app.exception_handler(HTTPException)
 async def http_exception_handler(request: Request, exc: HTTPException):
-    """Maneja excepciones HTTP con formato consistente"""
     logger.warning(f"HTTP {exc.status_code}: {exc.detail}")
     return JSONResponse(
         status_code=exc.status_code,
@@ -602,7 +517,6 @@ async def http_exception_handler(request: Request, exc: HTTPException):
     )
 @app.exception_handler(ValueError)
 async def value_error_handler(request: Request, exc: ValueError):
-    """Maneja errores de validación"""
     logger.warning(f"Validation error: {str(exc)}")
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
@@ -613,7 +527,6 @@ async def value_error_handler(request: Request, exc: ValueError):
     )
 @app.exception_handler(TimeoutError)
 async def timeout_error_handler(request: Request, exc: TimeoutError):
-    """Maneja errores de timeout"""
     logger.error(f"⏱️ Timeout error: {str(exc)}")
     return JSONResponse(
         status_code=status.HTTP_504_GATEWAY_TIMEOUT,
@@ -625,7 +538,6 @@ async def timeout_error_handler(request: Request, exc: TimeoutError):
 # Manejo de errores global
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
-    """Maneja todas las excepciones no capturadas"""
     logger.exception(f"Error no manejado: {exc}")
     return JSONResponse(
         status_code=500,
